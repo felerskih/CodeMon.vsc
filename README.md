@@ -13,6 +13,10 @@ Pictures drawn in MSPaint by me!!!
 ## Requirements
 Npm - `npm intall`
 
+## Build steps
+1. Run `vsce package`
+2. Run `code --install-extension codemon-0.0.1.vsix`
+
 ## Known Issues
 None yet!
 
