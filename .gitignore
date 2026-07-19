@@ -1,0 +1,23 @@
+# Node dependencies
+node_modules/
+npm-debug.log
+
+# Build outputs
+/out/
+/dist/
+
+# Test and coverage artifacts
+/coverage/
+.nyc_output/
+
+# VS Code environment and runtime caches
+/.vscode-test/
+.tsbuildinfo
+*.log
+
+# Locally packaged extension binaries
+*.vsix
+
+# Operating system files
+.DS_Store
+Thumbs.db

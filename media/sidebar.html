@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Security-Policy"
+            content="default-src 'none'; img-src ${cspSource} https:; style-src 'unsafe-inline'; script-src 'unsafe-inline';">
+        <style>
+            body {
+                font-family: var(--vscode-font-family);
+                color: var(--vscode-foreground);
+                padding: 12px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+            .stat-row div {
+                display: inline-block;
+            }
+            .stat-row {
+                display: flex;
+                gap: 6px;
+                margin-bottom: 4px;
+            }
+            .stat-label {
+                font-weight: 600;
+                color: var(--vscode-descriptionForeground);
+            }
+            .stat-value {
+                color: var(--vscode-foreground);
+            }
+            .mon-frame {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                justify-content: center;
+                width: 100%;
+                box-sizing: border-box;
+                border: 2px solid var(--vscode-panel-border);
+                padding: 8px 0;
+            }
+            #mon-image {
+                max-width: 96px;
+                height: auto;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="mon-frame">
+            <img id="mon-image" src=""/>
+            <div class="stat-row">
+                <span class="stat-label">Current Mon:</span>
+                <span id="stage" class="stat-value"></span>
+            </div>
+        </div>
+        <div class="stat-row">
+            <span class="stat-label">XP:</span>
+            <span id="xp" class="stat-value"></span>
+        </div>
+        <div class="stat-row">
+            <span class="stat-label">Time Remaining:</span>
+            <span id="timer" class="stat-value"></span>
+            
+        </div>
+        <button id="toggle-button">Pause</button>
+        <div id="notification" style="display: none;">
+            <span id="notification-text"></span>
+            <button id="reset-button">Reset Timer</button>
+        </div>
+
+        <script>
+            const vscode = acquireVsCodeApi();
+
+            window.addEventListener('message', event => {
+                if (event.data.type === 'notification') {
+                    document.getElementById('notification-text').textContent = event.data.message;
+                    document.getElementById('reset-button').textContent = event.data.buttonText;
+                    document.getElementById('notification').style.display = 'block';
+                    document.getElementById('toggle-button').style.display = 'none';
+                } else if (event.data.type === 'runningState') {
+                    document.getElementById('toggle-button').textContent = event.data.isRunning ? 'Pause' : 'Resume';
+                } else {
+                    const {XpProgress, Stage, DisplayTime, Action, ImageUri} = event.data;
+                    if (XpProgress) document.getElementById('xp').textContent = XpProgress;
+                    if (Stage) document.getElementById('stage').textContent = Stage;
+                    if (DisplayTime) document.getElementById('timer').textContent = DisplayTime;
+                    if (ImageUri) document.getElementById('mon-image').src = ImageUri;
+                }
+            });
+            
+            vscode.postMessage({ command: 'ready' });
+            
+            document.getElementById('reset-button').addEventListener('click', () => {
+                vscode.postMessage({ command: 'sessionComplete' });
+                document.getElementById('notification').style.display = 'none';
+                document.getElementById('toggle-button').style.display = 'block';
+            });
+
+            document.getElementById('toggle-button').addEventListener('click', () => {
+                vscode.postMessage({ command: 'toggleTimer' });
+            });
+        </script>
+    </body>
+</html>
