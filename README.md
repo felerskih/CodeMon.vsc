@@ -7,15 +7,18 @@ CodeMon is a Productivity Extension for VS Code. Evolve your CodeMon by investin
 Pomodoro Timer - Built in tracking for 25 minutes of working, 5 minutes of break. Gain XP for each working session!
 LoC tracker - Each 20 lines of code contributes 1 additional XP! (Subject to change, this is probably very minimal with AI tools)
 
-### Miscelaneous
+### Miscellaneous
 Pictures drawn in MSPaint by me!!!
 
 ## Requirements
-Npm - `npm intall`
+Node & Npm
+Python (for vsce)
 
 ## Build steps
-1. Run `vsce package`
-2. Run `code --install-extension codemon-0.0.1.vsix`
+1. Run `npm install`
+2. Run `npm install -g @vscode/vsce`
+3. Run `vsce package`
+4. Run `code --install-extension codemon-0.0.1.vsix`
 
 ## Known Issues
 None yet!
