@@ -49,6 +49,14 @@ export function activate(context: vscode.ExtensionContext) {
 		provider.updateRunningState(timer.getIsRunning());
 	});
 
+	provider.setOnEarlyBreak(() =>{
+		const msg = timer.getIsWorking() ? "Taking an early break 😴" : "Went back to exploring early!";
+		timer.reset();
+		provider.resetTimer(timer.getTimeRemaining(), !timer.getIsWorking(), linesWritten);
+		
+		provider.showEarlyBreak(msg);
+	});
+
 	provider.updateRunningState(timer.getIsRunning());
 
 	timer.start();

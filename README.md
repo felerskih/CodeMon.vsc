@@ -14,11 +14,15 @@ Pictures drawn in MSPaint by me!!!
 Node & Npm
 Python (for vsce)
 
+## Run Steps (from VSCode)
+1. Run `npm install`
+2. Press F5
+
 ## Build steps
 1. Run `npm install`
 2. Run `npm install -g @vscode/vsce`
 3. Run `vsce package`
-4. Run `code --install-extension codemon-0.0.1.vsix`
+4. Run `code --install-extension codemon-0.0.2.vsix --force`
 
 ## Known Issues
 None yet!
@@ -26,6 +30,15 @@ None yet!
 ## Release Notes
 ### 0.0.1
 Beta Release!
+
+### 0.0.2
+- Improved CSS to look more like a Dex
+- New buttons to end session/break early
+
+## Potential Future Features
+- Diminishing returns when ending breaks/sessions early
+- Skip Break entirely
+- Animations
 
 ## Following extension guidelines
 Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.

@@ -23,6 +23,7 @@ export class CodeMonSidebarProvider implements vscode.WebviewViewProvider {
 
   private onSessionCompleteAck?: () => void;
   private onToggleTimerRequested?: () => void;
+  private onEarlyBreak?:() => void;
 
 
   constructor(private readonly context: vscode.ExtensionContext) {
@@ -37,12 +38,22 @@ export class CodeMonSidebarProvider implements vscode.WebviewViewProvider {
     this.onToggleTimerRequested = callback;
   }
 
-  showSessionComplete(message: string, buttonText: string) {
-    this._view?.webview.postMessage({ type: 'notification', message: message, buttonText: buttonText });
+  setOnEarlyBreak(callback: () => void)
+  {
+    this.onEarlyBreak = callback;
+  }
+
+  showSessionComplete(message: string, buttonText: string | undefined ) {
+    this._view?.webview.postMessage({ type: 'notificationComplete', message: message, buttonText: buttonText });
   }
 
   updateRunningState(isRunning: boolean) {
     this._view?.webview.postMessage({ type: 'runningState', isRunning });
+  }
+
+  showEarlyBreak(message: string)
+  {
+    this._view?.webview.postMessage({ type: 'notificationEarly', message: message});
   }
 
   resolveWebviewView(view: vscode.WebviewView) {
@@ -65,8 +76,13 @@ export class CodeMonSidebarProvider implements vscode.WebviewViewProvider {
       }
       else if (message.command === 'sessionComplete') {
         this.onSessionCompleteAck?.();
-      }else if (message.command === 'toggleTimer') {
+      }
+      else if (message.command === 'toggleTimer') {
         this.onToggleTimerRequested?.();
+      }
+      else if (message.command === 'earlyBreak') {
+        console.log('earlyBreak received');
+        this.onEarlyBreak?.();
       }
     });
   }

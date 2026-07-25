@@ -37,7 +37,23 @@
                 width: 100%;
                 box-sizing: border-box;
                 border: 2px solid var(--vscode-panel-border);
-                padding: 8px 0;
+                padding: 8px;
+                margin: 8px;
+                background-color: white;
+                border-color: black;
+            }
+            .dex-frame {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                justify-content: center;
+                width: 100%;
+                box-sizing: border-box;
+                border: 2px solid var(--vscode-panel-border);
+                padding: 8px;
+                background-color: darkblue;
+                border-color: red;
             }
             #mon-image {
                 max-width: 96px;
@@ -45,40 +61,51 @@
             }
         </style>
     </head>
-    <body>
-        <div class="mon-frame">
-            <img id="mon-image" src=""/>
+    <body class="">
+        <div class="dex-frame">
+            <div class="mon-frame">
+                <img id="mon-image" src=""/>
+            </div>
             <div class="stat-row">
                 <span class="stat-label">Current Mon:</span>
                 <span id="stage" class="stat-value"></span>
             </div>
-        </div>
-        <div class="stat-row">
-            <span class="stat-label">XP:</span>
-            <span id="xp" class="stat-value"></span>
-        </div>
-        <div class="stat-row">
-            <span class="stat-label">Time Remaining:</span>
-            <span id="timer" class="stat-value"></span>
-            
-        </div>
-        <button id="toggle-button">Pause</button>
-        <div id="notification" style="display: none;">
-            <span id="notification-text"></span>
-            <button id="reset-button">Reset Timer</button>
+            <div class="stat-row">
+                <span class="stat-label">XP:</span>
+                <span id="xp" class="stat-value"></span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">Time Remaining:</span>
+                <span id="timer" class="stat-value"></span>
+            </div>
+            <div id="timer-buttons" class="stat-row">
+                <button id="toggle-button">Pause</button>
+                <button id="break-button">Break!</button>
+            </div>
+            <div id="notification" style="display: none;">
+                <span id="notification-text" style="padding: 0 8px"></span>
+                <button id="reset-button">Reset Timer</button>
+            </div>
         </div>
 
         <script>
             const vscode = acquireVsCodeApi();
 
             window.addEventListener('message', event => {
-                if (event.data.type === 'notification') {
+                if (event.data.type === 'notificationComplete') {
                     document.getElementById('notification-text').textContent = event.data.message;
                     document.getElementById('reset-button').textContent = event.data.buttonText;
-                    document.getElementById('notification').style.display = 'block';
-                    document.getElementById('toggle-button').style.display = 'none';
-                } else if (event.data.type === 'runningState') {
+                    document.getElementById('notification').style.display = 'flex';
+                    document.getElementById('reset-button').style.display = 'flex';
+                    document.getElementById('timer-buttons').style.display = 'none';
+                } else if (event.data.type === 'notificationEarly') {
+                    document.getElementById('notification-text').textContent = event.data.message;
+                    document.getElementById('notification').style.display = 'flex';
+                    document.getElementById('reset-button').style.display = 'none';
+                } 
+                else if (event.data.type === 'runningState') {
                     document.getElementById('toggle-button').textContent = event.data.isRunning ? 'Pause' : 'Resume';
+                    document.getElementById('break-button').style.display = event.data.isRunning ? 'flex' : 'none';
                 } else {
                     const {XpProgress, Stage, DisplayTime, Action, ImageUri} = event.data;
                     if (XpProgress) document.getElementById('xp').textContent = XpProgress;
@@ -93,7 +120,11 @@
             document.getElementById('reset-button').addEventListener('click', () => {
                 vscode.postMessage({ command: 'sessionComplete' });
                 document.getElementById('notification').style.display = 'none';
-                document.getElementById('toggle-button').style.display = 'block';
+                document.getElementById('timer-buttons').style.display = 'flex';
+            });
+
+            document.getElementById('break-button').addEventListener('click', () => {
+                vscode.postMessage({ command: 'earlyBreak' });
             });
 
             document.getElementById('toggle-button').addEventListener('click', () => {
