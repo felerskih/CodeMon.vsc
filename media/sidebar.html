@@ -84,7 +84,10 @@
             </div>
             <div id="notification" style="display: none;">
                 <span id="notification-text" style="padding: 0 8px"></span>
-                <button id="reset-button">Reset Timer</button>
+                <div id="notification-buttons">
+                    <button id="reset-button">Reset Timer</button>
+                    <button id="continue-button">Continue</button>
+                </div>
             </div>
         </div>
 
@@ -96,13 +99,16 @@
                     document.getElementById('notification-text').textContent = event.data.message;
                     document.getElementById('reset-button').textContent = event.data.buttonText;
                     document.getElementById('notification').style.display = 'flex';
-                    document.getElementById('reset-button').style.display = 'flex';
+                    document.getElementById('notification-buttons').style.display = 'flex';
                     document.getElementById('timer-buttons').style.display = 'none';
                 } else if (event.data.type === 'notificationEarly') {
                     document.getElementById('notification-text').textContent = event.data.message;
+                    document.getElementById('break-button').textContent = event.data.buttonText;
                     document.getElementById('notification').style.display = 'flex';
-                    document.getElementById('reset-button').style.display = 'none';
-                } 
+                    document.getElementById('notification-buttons').style.display = 'none';
+                } else if (event.data.type === 'breakTextChange') {
+                    document.getElementById('break-button').textContent = event.data.breakText;
+                }
                 else if (event.data.type === 'runningState') {
                     document.getElementById('toggle-button').textContent = event.data.isRunning ? 'Pause' : 'Resume';
                     document.getElementById('break-button').style.display = event.data.isRunning ? 'flex' : 'none';
@@ -115,7 +121,7 @@
                 }
             });
             
-            vscode.postMessage({ command: 'ready' });
+            vscode.postMessage({ command: 'ready' })
             
             document.getElementById('reset-button').addEventListener('click', () => {
                 vscode.postMessage({ command: 'sessionComplete' });
@@ -123,12 +129,18 @@
                 document.getElementById('timer-buttons').style.display = 'flex';
             });
 
-            document.getElementById('break-button').addEventListener('click', () => {
-                vscode.postMessage({ command: 'earlyBreak' });
+            document.getElementById('continue-button').addEventListener('click', () => {
+                vscode.postMessage({ command: 'continue' });
+                document.getElementById('notification').style.display = 'none';
+                document.getElementById('timer-buttons').style.display = 'flex';
             });
 
             document.getElementById('toggle-button').addEventListener('click', () => {
                 vscode.postMessage({ command: 'toggleTimer' });
+            });
+
+            document.getElementById('break-button').addEventListener('click', () => {
+                vscode.postMessage({ command: 'earlyBreak' });
             });
         </script>
     </body>

@@ -20,8 +20,10 @@ export class CodeMonSidebarProvider implements vscode.WebviewViewProvider {
   };
 
   private xpPerWorkingSession = 5;
+  private breaksSkipped = 0;
 
   private onSessionCompleteAck?: () => void;
+  private onContinueAck?: () => void;
   private onToggleTimerRequested?: () => void;
   private onEarlyBreak?:() => void;
 
@@ -34,6 +36,10 @@ export class CodeMonSidebarProvider implements vscode.WebviewViewProvider {
     this.onSessionCompleteAck = callback;
   }
 
+  setOnContinueAck(callback: () => void) {
+    this.onContinueAck = callback;
+  }
+
   setOnToggleTimerRequested(callback: () => void) {
     this.onToggleTimerRequested = callback;
   }
@@ -43,7 +49,7 @@ export class CodeMonSidebarProvider implements vscode.WebviewViewProvider {
     this.onEarlyBreak = callback;
   }
 
-  showSessionComplete(message: string, buttonText: string | undefined ) {
+  showSessionComplete(message: string, buttonText: string) {
     this._view?.webview.postMessage({ type: 'notificationComplete', message: message, buttonText: buttonText });
   }
 
@@ -51,9 +57,13 @@ export class CodeMonSidebarProvider implements vscode.WebviewViewProvider {
     this._view?.webview.postMessage({ type: 'runningState', isRunning });
   }
 
-  showEarlyBreak(message: string)
+  showEarlyBreak(message: string, buttonText: string)
   {
-    this._view?.webview.postMessage({ type: 'notificationEarly', message: message});
+    this._view?.webview.postMessage({ type: 'notificationEarly', message: message, buttonText: buttonText});
+  }
+
+  updateBreakText(breakText: string) {
+    this._view?.webview.postMessage({ type: 'breakTextChange', breakText: breakText });
   }
 
   resolveWebviewView(view: vscode.WebviewView) {
@@ -76,12 +86,13 @@ export class CodeMonSidebarProvider implements vscode.WebviewViewProvider {
       }
       else if (message.command === 'sessionComplete') {
         this.onSessionCompleteAck?.();
+      } else if (message.command === 'continue') {
+        this.onContinueAck?.();
       }
       else if (message.command === 'toggleTimer') {
         this.onToggleTimerRequested?.();
       }
       else if (message.command === 'earlyBreak') {
-        console.log('earlyBreak received');
         this.onEarlyBreak?.();
       }
     });
@@ -93,18 +104,42 @@ export class CodeMonSidebarProvider implements vscode.WebviewViewProvider {
     this._view?.webview.postMessage(this.currentState);
   }
 
-  resetTimer(time: number, isWorking: boolean, linesWritten: number = 0) {
+  resetTimer(time: number, isWorking: boolean, linesWritten: number = 0, timeBeforeBreak: number = 0, isContinue: boolean = false) {
+    var sessionXp = this.calculateSessionXp(timeBeforeBreak, isContinue);
+    var linesXp = this.calculateLinesXp(linesWritten);
     if (isWorking)
-      this.update(linesWritten)
+      this.update(linesXp, sessionXp);
     this.currentState.DisplayTime = this.formatTime(time);
     this._view?.webview.postMessage(this.currentState);
   }
 
-  private update(linesWritten: number): boolean {
-    var evolved = false;    
-    var linesXp = linesWritten / 20;
+  private calculateSessionXp(timeBeforeBreak: number, isContinue: boolean)
+  {
+    var sessionXp = this.xpPerWorkingSession;
+    if (timeBeforeBreak != 0) {
+      var percentageLeft = timeBeforeBreak / GLOBALS().WorkTime;
+      var percentageComplete = Math.round((1 - percentageLeft) * 10) / 10;
+      sessionXp = sessionXp * percentageComplete;
+    }
+    if(isContinue)
+    {
+      var continueXp = sessionXp - this.breaksSkipped++;
+      sessionXp = continueXp > 0 ? continueXp : 0;
+    }
+    else
+      this.breaksSkipped = 0;
+    return sessionXp;
+  }
 
-    this.currentMon!.CurrentXp += this.xpPerWorkingSession + linesXp;
+  private calculateLinesXp(linesWritten: number)
+  {
+    return linesWritten / 20;
+  }
+
+  private update(linesXp: number, timeXp: number): boolean {
+    var evolved = false;  
+
+    this.currentMon!.CurrentXp += timeXp + linesXp;
     if(this.currentMon!.CurrentXp >= this.currentMon!.EvolvesAt && this.currentMon?.NextStage !== undefined)
     {
       this.currentMon = this.currentMon?.NextStage;

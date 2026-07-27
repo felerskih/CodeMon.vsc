@@ -35,9 +35,10 @@ export class PomodoroTimer {
     this.isRunning = false;
   }
 
-  reset() {
+  reset(keepIsWorking: boolean = false) {
     this.stop();
-	  this.isWorking = !this.isWorking;
+    if(!keepIsWorking)
+	    this.isWorking = !this.isWorking;
     this.timeRemaining = this.isWorking ? GLOBALS().WorkTime : GLOBALS().BreakTime;
 	  this.start();
   }

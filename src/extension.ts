@@ -28,8 +28,9 @@ export function activate(context: vscode.ExtensionContext) {
 		(remaining) => provider.updateTimer(remaining),
 		() => 
 			{
-				const msg = timer.getIsWorking() ? "25-minute focus session complete! Great work!" : "Break Time Over!";
+				const msg = timer.getIsWorking() ? "Session complete! Great work!" : "Break Time Over!";
 				const btnTxt = timer.getIsWorking() ? "+5 Exp" : "Back to work";
+				
 				provider.showSessionComplete(msg, btnTxt);
 			}
 	);
@@ -37,6 +38,14 @@ export function activate(context: vscode.ExtensionContext) {
 	provider.setOnSessionCompleteAck(() => {
 		timer.reset();
 		provider.resetTimer(timer.getTimeRemaining(), !timer.getIsWorking(), linesWritten);
+		const breakTxt = timer.getIsWorking() ? "Break!" : "Work!";
+		provider.updateBreakText(breakTxt);
+		linesWritten = 0;
+	});
+
+	provider.setOnContinueAck(() => {
+		timer.reset(true);
+		provider.resetTimer(timer.getTimeRemaining(), timer.getIsWorking(), linesWritten, 0, true);
 		linesWritten = 0;
 	});
 
@@ -50,11 +59,13 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 
 	provider.setOnEarlyBreak(() =>{
+		var timeBeforeBreak = timer.getTimeRemaining();
 		const msg = timer.getIsWorking() ? "Taking an early break 😴" : "Went back to exploring early!";
+		const btnMsg = timer.getIsWorking() ? "Work!" : "Break!";
 		timer.reset();
-		provider.resetTimer(timer.getTimeRemaining(), !timer.getIsWorking(), linesWritten);
+		provider.resetTimer(timer.getTimeRemaining(), !timer.getIsWorking(), linesWritten, timeBeforeBreak);
 		
-		provider.showEarlyBreak(msg);
+		provider.showEarlyBreak(msg, btnMsg);
 	});
 
 	provider.updateRunningState(timer.getIsRunning());

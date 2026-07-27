@@ -22,10 +22,11 @@ Python (for vsce)
 1. Run `npm install`
 2. Run `npm install -g @vscode/vsce`
 3. Run `vsce package`
-4. Run `code --install-extension codemon-0.0.2.vsix --force`
+4. Run `code --install-extension codemon-0.0.3.vsix --force`
 
 ## Known Issues
 None yet!
+The Break Text should toggle depending on state
 
 ## Release Notes
 ### 0.0.1
@@ -35,10 +36,15 @@ Beta Release!
 - Improved CSS to look more like a Dex
 - New buttons to end session/break early
 
+### 0.0.3
+- Improved UI for end session/end break button
+- Continue to Next Session/Continue Break
+- Diminishing returns for ending session early and skipping breaks
+
 ## Potential Future Features
-- Diminishing returns when ending breaks/sessions early
-- Skip Break entirely
+- Adventure Text
 - Animations
+- More Mon
 
 ## Following extension guidelines
 Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
