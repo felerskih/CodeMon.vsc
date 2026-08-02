@@ -37,6 +37,7 @@ export function activate(context: vscode.ExtensionContext) {
 	
 	provider.setOnSessionCompleteAck(() => {
 		timer.reset();
+
 		provider.resetTimer(timer.getTimeRemaining(), !timer.getIsWorking(), linesWritten);
 		const breakTxt = timer.getIsWorking() ? "Break!" : "Work!";
 		provider.updateBreakText(breakTxt);
