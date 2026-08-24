@@ -13,6 +13,11 @@ export class PomodoroTimer {
     this.onComplete = onComplete;
   }
 
+  deactivate () {
+    this.stop()
+    this.timeRemaining = 0;
+  }
+
   start() {
     if (this.isRunning) return;
     this.isRunning = true;

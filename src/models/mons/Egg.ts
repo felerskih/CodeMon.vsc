@@ -1,12 +1,15 @@
 import { Codemon } from "./Codemon";
 import { SabreCub } from "./SabreCub";
 
-export class Egg implements Codemon {
-    Name = "Egg";
-    EvolvesAt = 5;
-    NextStage = new SabreCub();
-    ImageFileName = "egg.png";
-    CurrentXp = 0;
+export class Egg extends Codemon {
+    private readonly customBreakText = "Your mon needs to rest a bit as it hatches!";
+    constructor() {
+        super("Egg", 5, "egg.png", new SabreCub());
+    }
 
-    constructor() {}
+    public override getBreakText()
+    {
+        return this.customBreakText;
+    }
+
 }

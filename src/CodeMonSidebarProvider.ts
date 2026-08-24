@@ -49,21 +49,45 @@ export class CodeMonSidebarProvider implements vscode.WebviewViewProvider {
     this.onEarlyBreak = callback;
   }
 
-  showSessionComplete(message: string, buttonText: string) {
-    this._view?.webview.postMessage({ type: 'notificationComplete', message: message, buttonText: buttonText });
+  showSessionComplete(isWorking: boolean) {
+    var message = "";
+    var buttonText = "";
+    if(isWorking)
+    {
+      message = this.currentMon!.getBreakText();
+      buttonText = "+5 XP";
+    }
+    else
+    {
+      message = this.currentMon!.getStartText();
+      buttonText = "Back to work";
+    }
+    this._view?.webview.postMessage({ type: 'notificationComplete', message, buttonText, isWorking });
   }
 
   updateRunningState(isRunning: boolean) {
     this._view?.webview.postMessage({ type: 'runningState', isRunning });
   }
 
-  showEarlyBreak(message: string, buttonText: string)
+  showEarlyBreak(isWorking: boolean)
   {
-    this._view?.webview.postMessage({ type: 'notificationEarly', message: message, buttonText: buttonText});
+    var message = "";
+    var buttonText = "";
+    if(isWorking)
+    {
+      message = "Taking an early break 😴";
+      buttonText = "Work!";
+    }
+    else
+    {
+      message = "Went back to exploring early!";
+      buttonText = "Break!";
+    }
+    this._view?.webview.postMessage({ type: 'notificationEarly', message, buttonText, isWorking});
   }
 
   updateBreakText(breakText: string) {
-    this._view?.webview.postMessage({ type: 'breakTextChange', breakText: breakText });
+    this._view?.webview.postMessage({ type: 'breakTextChange', breakText });
   }
 
   resolveWebviewView(view: vscode.WebviewView) {

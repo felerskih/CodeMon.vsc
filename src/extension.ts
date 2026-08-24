@@ -6,6 +6,7 @@ import { CodeMonSidebarProvider } from './CodeMonSidebarProvider';
 import { PomodoroTimer } from './PomodoroTimer';
 import { initGlobals } from './models/Globals';
 
+let timer: PomodoroTimer;
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
@@ -24,14 +25,11 @@ export function activate(context: vscode.ExtensionContext) {
 		provider)
 	);
 	
-	const timer = new PomodoroTimer(
+	timer = new PomodoroTimer(
 		(remaining) => provider.updateTimer(remaining),
 		() => 
-			{
-				const msg = timer.getIsWorking() ? "Session complete! Great work!" : "Break Time Over!";
-				const btnTxt = timer.getIsWorking() ? "+5 Exp" : "Back to work";
-				
-				provider.showSessionComplete(msg, btnTxt);
+			{				
+				provider.showSessionComplete(timer.getIsWorking());
 			}
 	);
 	
@@ -61,12 +59,10 @@ export function activate(context: vscode.ExtensionContext) {
 
 	provider.setOnEarlyBreak(() =>{
 		var timeBeforeBreak = timer.getTimeRemaining();
-		const msg = timer.getIsWorking() ? "Taking an early break 😴" : "Went back to exploring early!";
-		const btnMsg = timer.getIsWorking() ? "Work!" : "Break!";
 		timer.reset();
 		provider.resetTimer(timer.getTimeRemaining(), !timer.getIsWorking(), linesWritten, timeBeforeBreak);
 		
-		provider.showEarlyBreak(msg, btnMsg);
+		provider.showEarlyBreak(!timer.getIsWorking());
 	});
 
 	provider.updateRunningState(timer.getIsRunning());
@@ -106,7 +102,9 @@ export function activate(context: vscode.ExtensionContext) {
 }
 
 // This method is called when your extension is deactivated
-export function deactivate() {}
+export function deactivate() {
+	timer.deactivate();
+}
 
 function countLines(text: string): number {
 	if (text.length === 0) return 0;

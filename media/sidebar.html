@@ -58,6 +58,30 @@
             #mon-image {
                 max-width: 96px;
                 height: auto;
+                animation: wander 4s ease-in-out infinite;
+                animation-play-state: running;
+            }
+
+            #mon-image.paused {
+                animation-play-state: paused;
+            }
+
+            #mon-image.stage-egg {
+                animation: wiggle 1.5s ease-in-out infinite;
+            }
+
+            @keyframes wander {
+                0%   { transform: translateX(-30px) scaleX(1); }
+                45%  { transform: translateX(30px) scaleX(1); }
+                50%  { transform: translateX(30px) scaleX(-1); } /* flip to "face" the other way */
+                95%  { transform: translateX(-30px) scaleX(-1); }
+                100% { transform: translateX(-30px) scaleX(1); }
+            }
+
+            @keyframes wiggle {
+                0%, 100% { transform: rotate(0deg); }
+                25% { transform: rotate(-4deg); }
+                75% { transform: rotate(4deg); }
             }
         </style>
     </head>
@@ -101,11 +125,13 @@
                     document.getElementById('notification').style.display = 'flex';
                     document.getElementById('notification-buttons').style.display = 'flex';
                     document.getElementById('timer-buttons').style.display = 'none';
+                    document.getElementById('mon-image').classList.toggle('paused', event.data.isWorking);
                 } else if (event.data.type === 'notificationEarly') {
                     document.getElementById('notification-text').textContent = event.data.message;
                     document.getElementById('break-button').textContent = event.data.buttonText;
                     document.getElementById('notification').style.display = 'flex';
                     document.getElementById('notification-buttons').style.display = 'none';
+                    document.getElementById('mon-image').classList.toggle('paused', event.data.isWorking);
                 } else if (event.data.type === 'breakTextChange') {
                     document.getElementById('break-button').textContent = event.data.breakText;
                 }
@@ -115,7 +141,10 @@
                 } else {
                     const {XpProgress, Stage, DisplayTime, Action, ImageUri} = event.data;
                     if (XpProgress) document.getElementById('xp').textContent = XpProgress;
-                    if (Stage) document.getElementById('stage').textContent = Stage;
+                    if (Stage) {
+                        document.getElementById('stage').textContent = Stage;
+                        document.getElementById('mon-image').classList.toggle('stage-egg', Stage === 'Egg');
+                    }
                     if (DisplayTime) document.getElementById('timer').textContent = DisplayTime;
                     if (ImageUri) document.getElementById('mon-image').src = ImageUri;
                 }
@@ -133,6 +162,7 @@
                 vscode.postMessage({ command: 'continue' });
                 document.getElementById('notification').style.display = 'none';
                 document.getElementById('timer-buttons').style.display = 'flex';
+                document.getElementById('mon-image').classList.toggle('paused');
             });
 
             document.getElementById('toggle-button').addEventListener('click', () => {

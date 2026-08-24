@@ -22,10 +22,10 @@ Python (for vsce)
 1. Run `npm install`
 2. Run `npm install -g @vscode/vsce`
 3. Run `vsce package`
-4. Run `code --install-extension codemon-0.0.4.vsix --force`
+4. Run `code --install-extension codemon-0.0.5.vsix --force`
 
 ## Known Issues
-None yet!
+None right now!
 
 ## Release Notes
 ### 0.0.1
@@ -43,9 +43,12 @@ Beta Release!
 ### 0.0.4
 - Swapped position of Continue and reset buttons
 
+### 0.0.5
+- Added fun text for start and end of session, including options for end of session text
+- Added animations to the Mons
+- Fixed issues breaking vsce publishing
+
 ## Potential Future Features
-- Adventure Text
-- Animations
 - More Mon
 
 ## Following extension guidelines
