@@ -61,27 +61,35 @@
                 animation: wander 4s ease-in-out infinite;
                 animation-play-state: running;
             }
-
             #mon-image.paused {
                 animation-play-state: paused;
             }
-
             #mon-image.stage-egg {
                 animation: wiggle 1.5s ease-in-out infinite;
             }
+            #mon-image.evolving {
+                animation: evolvePop 0.4s ease-out;
+            }
 
             @keyframes wander {
-                0%   { transform: translateX(-30px) scaleX(1); }
-                45%  { transform: translateX(30px) scaleX(1); }
-                50%  { transform: translateX(30px) scaleX(-1); } /* flip to "face" the other way */
-                95%  { transform: translateX(-30px) scaleX(-1); }
-                100% { transform: translateX(-30px) scaleX(1); }
+                0%     { transform: translateX(0)     scaleX(1);  } /* starts centered, facing right */
+                22.5%  { transform: translateX(30px)  scaleX(1);  }
+                27.5%  { transform: translateX(30px)  scaleX(-1); } /* flip to face left */
+                72.5%  { transform: translateX(-30px) scaleX(-1); }
+                77.5%  { transform: translateX(-30px) scaleX(1);  } /* flip back to face right */
+                100%   { transform: translateX(0)     scaleX(1);  } /* back to center, loop closes cleanly */
             }
 
             @keyframes wiggle {
                 0%, 100% { transform: rotate(0deg); }
                 25% { transform: rotate(-4deg); }
                 75% { transform: rotate(4deg); }
+            }
+
+            @keyframes evolvePop {
+                0%   { transform: scale(0.7); opacity: 0.3; }
+                60%  { transform: scale(1.15); opacity: 1; }
+                100% { transform: scale(1); opacity: 1; }
             }
         </style>
     </head>
@@ -117,6 +125,7 @@
 
         <script>
             const vscode = acquireVsCodeApi();
+            let currentStage = null;
 
             window.addEventListener('message', event => {
                 if (event.data.type === 'notificationComplete') {
@@ -142,8 +151,21 @@
                     const {XpProgress, Stage, DisplayTime, Action, ImageUri} = event.data;
                     if (XpProgress) document.getElementById('xp').textContent = XpProgress;
                     if (Stage) {
+                        const evolved = currentStage !== null && Stage !== 'Egg' && currentStage !== Stage;
+                        currentStage = Stage;
                         document.getElementById('stage').textContent = Stage;
                         document.getElementById('mon-image').classList.toggle('stage-egg', Stage === 'Egg');
+                        const monImage = document.getElementById('mon-image');
+                        monImage.classList.toggle('stage-egg', Stage === 'Egg');
+
+                        if (evolved) {
+                            // freeze on evolution, force reflow, then release into current running state
+                            monImage.classList.add('evolving');
+                            void monImage.offsetWidth; // force reflow so the animation reset registers
+                            //setTimeout(() => setPaused(!isRunning), 400); // brief settle before resuming motion
+                        }
+                        else
+                            monImage.classList.remove('evolving');
                     }
                     if (DisplayTime) document.getElementById('timer').textContent = DisplayTime;
                     if (ImageUri) document.getElementById('mon-image').src = ImageUri;
