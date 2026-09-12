@@ -2,7 +2,7 @@
   "name": "codemon",
   "displayName": "CodeMon",
   "description": "Pet Code Monster",
-  "version": "0.0.6",
+  "version": "0.1.0",
   "license": "MIT",
   "engines": {
     "vscode": "^1.107.0"

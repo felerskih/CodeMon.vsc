@@ -3,14 +3,14 @@ import * as fs from 'fs';
 
 import { SidebarState } from './models/messages/SidebarState'
 import { Codemon } from './models/mons/Codemon';
-import { Egg } from './models/mons/Egg';
+import { EggFactory } from './factories/EggFactory';
 import { GLOBALS } from './models/Globals';
 
 export class CodeMonSidebarProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = 'codemon.sidebar';
 
   private _view?: vscode.WebviewView;
-  private currentMon: Codemon | undefined = new Egg();
+  private currentMon: Codemon | undefined = EggFactory.create();
   private currentState: SidebarState =
   {
     XpProgress: `0/${this.currentMon?.EvolvesAt}`,

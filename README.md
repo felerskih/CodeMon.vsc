@@ -22,7 +22,7 @@ Python (for vsce)
 1. Run `npm install`
 2. Run `npm install -g @vscode/vsce`
 3. Run `vsce package`
-4. Run `code --install-extension codemon-0.0.6.vsix --force`
+4. Run `code --install-extension codemon-0.1.0.vsix --force`
 
 ## Known Issues
 None right now!
@@ -52,9 +52,15 @@ Beta Release!
 - Animations were not fluid on startup
 - Added animation during evolution
 
+### 0.1.0
+- Beta release build
+- Include multiple mon with different stage counts
+- Start of unit tests
+- Restructuring of Mon folders
+
 ## Potential Future Features
-- More Mon
 - Feature to get a new mon after fully evolving
+- Choose length of session, get different mon with different number of stages
 
 ## Following extension guidelines
 Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
